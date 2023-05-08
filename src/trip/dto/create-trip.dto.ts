@@ -17,14 +17,22 @@ export class CreateTripDTO {
   price: number;
 
   @IsNotEmpty()
+  @IsNumber()
+  startLocation: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  endLocation: number;
+
+  @IsNotEmpty()
   @IsDateString()
   timeStart: string;
 
   @IsOptional()
   @IsDateString()
-  timeEnd: string;
+  timeEnd?: string;
 
   @IsNotEmpty()
   @IsEnum(TripStatus)
-  status: TripStatus
+  status: number
 }

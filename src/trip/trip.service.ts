@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, ForbiddenException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateTripDTO, TripQueryDTO } from './dto';
 
 @Injectable()
 export class TripService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    ) {}
   //get list trip
   async getAll(query: TripQueryDTO) {
     const option = {
@@ -24,7 +26,33 @@ export class TripService {
     return { total, data };
   }
   //create Trip
-  async create(createTripDTO: CreateTripDTO){
-    
+  async create(createTripDTO: CreateTripDTO){ 
+    try {
+      const bus = await this.prismaService.bus.findUnique({
+        where: {id: createTripDTO.busId},
+        include: {
+          type: true 
+        }
+      }) 
+      const listTicket: string[] = JSON.parse(bus.type.listTicket)
+      const createTrip = await this.prismaService.trip.create({
+        data: {
+          ...createTripDTO,
+          tickets: {
+            createMany: {
+              data: listTicket.map((ticket : string) => {
+                return {
+                  code: ticket,
+                  status: 0
+                }
+              })
+          },
+        },
+      }
+    })
+    return createTrip
+    } catch (error) {
+      throw new ForbiddenException("Create Trip error!!!")
+    }
   };
 }

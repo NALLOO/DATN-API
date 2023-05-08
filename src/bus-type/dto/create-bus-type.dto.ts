@@ -8,4 +8,8 @@ export class CreateBusTypeDTO{
   @IsNotEmpty()
   @IsNumber()
   numberOfSeat: number
+
+  @IsNotEmpty()
+  @IsString()
+  listTicket: string
 }

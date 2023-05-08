@@ -27,6 +27,7 @@ model BusType {
   id           Int    @id @default(autoincrement())
   name         String @unique()
   numberOfSeat Int
+  listTicket   String
   buses        Bus[]
 }
 
@@ -48,7 +49,6 @@ model Trip {
   timeEnd       DateTime?
   startLocation Int
   endLocation   Int
-  emptyTicket   String[]
   status        Int
   tickets       Ticket[]
 }
