@@ -13,17 +13,17 @@ export class TripService {
       startLocation: query.start_location,
       endLocation: query.end_location,
     };
-    const [total, data] = await this.prismaService.$transaction([
-      this.prismaService.trip.count({
-        where: option,
-      }),
-      this.prismaService.trip.findMany({
-        skip: ((query.page - 1) | 0) * (query.limit | 10),
-        take: query.limit | 10,
-        where: option,
-      }),
-    ]);
-    return { total, data };
+    // const [total, data] = await this.prismaService.$transaction([
+    //   this.prismaService.trip.count({
+    //     where: option,
+    //   }),
+    //   this.prismaService.trip.findMany({
+    //     skip: ((query.page - 1) | 0) * (query.limit | 10),
+    //     take: query.limit | 10,
+    //     where: option,
+    //   }),
+    // ]);
+    return { };
   }
   //create Trip
   async create(createTripDTO: CreateTripDTO){ 
@@ -35,22 +35,22 @@ export class TripService {
         }
       }) 
       const listTicket: string[] = JSON.parse(bus.type.listTicket)
-      const createTrip = await this.prismaService.trip.create({
-        data: {
-          ...createTripDTO,
-          tickets: {
-            createMany: {
-              data: listTicket.map((ticket : string) => {
-                return {
-                  code: ticket,
-                  status: 0
-                }
-              })
-          },
-        },
-      }
-    })
-    return createTrip
+    //   const createTrip = await this.prismaService.trip.create({
+    //     data: {
+    //       ...createTripDTO,
+    //       tickets: {
+    //         createMany: {
+    //           data: listTicket.map((ticket : string) => {
+    //             return {
+    //               code: ticket,
+    //               status: 0
+    //             }
+    //           })
+    //       },
+    //     },
+    //   }
+    // })
+    return 
     } catch (error) {
       throw new ForbiddenException("Create Trip error!!!")
     }
