@@ -13,7 +13,12 @@ export class BusTypeService {
   //get all bus type
   async getAll() {
     const data = await this.prismaService.busType.findMany({});
-    return data;
+    return data.map(item => {
+      return {
+        ...item,
+        listTicket: JSON.parse(item.listTicket)
+      }
+    });
   }
   //create bus type
   async create(createBusTypeDTO: CreateBusTypeDTO) {

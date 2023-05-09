@@ -1,15 +1,11 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class CreateBusTypeDTO{
+export class CreateLocationDTO {
+  @IsNotEmpty()
+  @IsNumber()
+  provinceId: number
+
   @IsNotEmpty()
   @IsString()
   name: string
-
-  @IsNotEmpty()
-  @IsNumber()
-  numberOfSeat: number
-
-  @IsNotEmpty()
-  @IsString()
-  listTicket: string
 }

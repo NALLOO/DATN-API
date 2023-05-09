@@ -3,17 +3,17 @@ import { IsNumber, IsOptional } from 'class-validator';
 export class TripQueryDTO {
   @IsNumber()
   @IsOptional()
-  start_location: number;
+  startProvince?: number;
 
   @IsNumber()
   @IsOptional()
-  end_location: number;
+  endProvince?: number;
 
   @IsNumber()
   @IsOptional()
-  page: number;
+  page?: number;
 
   @IsNumber()
   @IsOptional()
-  limit: number;
+  limit?: number;
 }
