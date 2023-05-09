@@ -34,7 +34,7 @@ model BusType {
 
 model Bus {
   id       Int     @id @default(autoincrement())
-  author   User    @relation("authorBus", fields: [authorId], references: [id])
+  author   User    @relation("authorBus", fields: [authorId], references: [id], onDelete: Cascade)
   authorId Int
   type     BusType @relation(fields: [typeId], references: [id])
   typeId   Int
@@ -43,9 +43,9 @@ model Bus {
 
 model Trip {
   id        Int       @id @default(autoincrement())
-  bus       Bus       @relation(fields: [busId], references: [id])
+  bus       Bus       @relation(fields: [busId], references: [id], onDelete: Cascade)
   busId     Int
-  route     Route     @relation(fields: [routeId], references: [id])
+  route     Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
   routeId   Int
   price     Int
   timeStart DateTime
@@ -57,9 +57,9 @@ model Trip {
 model Ticket {
   id       Int    @id @default(autoincrement())
   code     String
-  trip     Trip   @relation(fields: [tripId], references: [id])
+  trip     Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
   tripId   Int
-  author   User?  @relation(fields: [authorId], references: [id])
+  author   User?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId Int?
   status   Int
 }
@@ -75,28 +75,28 @@ model Province {
 model Location {
   id         Int                @id @default(autoincrement())
   name       String
-  province   Province           @relation(fields: [provinceId], references: [id])
+  province   Province           @relation(fields: [provinceId], references: [id], onDelete: Cascade)
   provinceId Int
   routes     RouteMapLocation[]
 }
 
 model Route {
   id              Int                @id @default(autoincrement())
-  author          User               @relation(fields: [authorId], references: [id])
+  author          User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId        Int
   trips           Trip[]
-  startProvince   Province           @relation("start province", fields: [startProvinceId], references: [id])
+  startProvince   Province           @relation("start province", fields: [startProvinceId], references: [id], onDelete: Cascade)
   startProvinceId Int
-  endProvince     Province           @relation("end province", fields: [endProvinceId], references: [id])
+  endProvince     Province           @relation("end province", fields: [endProvinceId], references: [id], onDelete: Cascade)
   endProvinceId   Int
   locations       RouteMapLocation[]
 }
 
 model RouteMapLocation {
   id         Int      @id @default(autoincrement())
-  route      Route    @relation(fields: [routeId], references: [id])
+  route      Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
   routeId    Int
-  location   Location @relation(fields: [locationId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
   locationId Int
   type       Int
 }

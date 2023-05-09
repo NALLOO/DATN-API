@@ -11,6 +11,7 @@ import { TicketModule } from './ticket/ticket.module';
 import { TripModule } from './trip/trip.module';
 import { RouteModule } from './route/route.module';
 import { LocationModule } from './location/location.module';
+import { ProvinceModule } from './province/province.module';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { LocationModule } from './location/location.module';
     }),
     UserModule, 
     AuthModule, 
-    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule
+    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule, ProvinceModule
   ],
   controllers: [AppController],
   providers: [AppService],
