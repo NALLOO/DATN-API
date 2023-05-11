@@ -1,4 +1,5 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { OrderByEnum } from '../enum/order-by.enum';
 
 export class TripQueryDTO {
   @IsNumber()
@@ -16,4 +17,14 @@ export class TripQueryDTO {
   @IsNumber()
   @IsOptional()
   limit?: number;
+
+  @IsString()
+  @IsOptional()
+  @IsEnum(OrderByEnum)
+  orderBy: OrderByEnum
+
+  @IsString()
+  @IsDateString()
+  date: Date
+
 }
