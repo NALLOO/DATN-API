@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRouteDTO, QueryRoute, RouteMapLocationDTO } from './dto';
 import { LocationType } from '../location/enum/location-type.enum';
+import { Role } from 'src/auth/enum/role.enum';
 
 @Injectable()
 export class RouteService {
@@ -46,20 +47,20 @@ export class RouteService {
     } catch (error) {}
   }
   //get all route
-  async getAll(query: QueryRoute) {
+  async getAll(user: any, query: any) {
     try {
-      const option = query.authorId ? { authorId: query.authorId } : {};
+      const option = user.role !== Role.ADMIN ? { authorId: user.id } : {};
       const [total, res] = await this.prismaService.$transaction([
         this.prismaService.route.count({
           where: option,
         }),
         this.prismaService.route.findMany({
-          skip: ((query.page - 1) | 0) * (query.limit | 10),
-          take: query.limit | 10,
+          skip: ((parseInt(query.page) - 1) | 0) * (parseInt(query.limit) | 10),
+          take: parseInt(query.limit) | 10,
           where: option,
         }),
       ]);
-      return { total, res };
+      return { total, result: res };
     } catch (error) {
       throw new ForbiddenException(error);
     }
@@ -73,5 +74,27 @@ export class RouteService {
         },
       });
     } catch (error) {}
+  }
+  //get detail
+  async getDetail(routeId: number) {
+    try {
+      const res = await this.prismaService.route.findUnique({
+        where: {
+          id: routeId,
+        },
+        include: {
+          startProvince: true,
+          endProvince: true,
+          locations: {
+            include: {
+              location: true,
+            },
+          },
+        },
+      });
+      return res;
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { BusTypeData } from './BusType';
+import { ListProvince } from './Province';
 
 const prisma = new PrismaClient();
 async function main() {
@@ -7,6 +8,10 @@ async function main() {
     prisma.busType.deleteMany({}),
     prisma.busType.createMany({
       data: BusTypeData,
+    }),
+    prisma.province.deleteMany({}),
+    prisma.province.createMany({
+      data: ListProvince,
     }),
   ]);
 }
@@ -16,7 +21,6 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e);
     await prisma.$disconnect();
     process.exit(1);
   });

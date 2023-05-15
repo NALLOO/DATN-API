@@ -50,8 +50,13 @@ export class RouteController {
   //get route
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAll(@Req() request: RequestWithUser, @Query() query: QueryRoute) {
-    const res = await this.routeService.getAll(query);
+  async getAll(@Req() request: RequestWithUser, @Query() query: any) {
+    const res = await this.routeService.getAll(request.user, query);
+    return new CustomResponse(res);
+  }
+  @Get('detail/:id')
+  async getDetail(@Param('id', ParseIntPipe) routeId: number) {
+    const res = await this.routeService.getDetail(routeId);
     return new CustomResponse(res);
   }
 }
