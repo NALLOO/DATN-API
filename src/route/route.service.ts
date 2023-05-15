@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRouteDTO, QueryRoute, RouteMapLocationDTO } from './dto';
+import { CreateRouteDTO, QueryRoute, RouteMapLocationDTO, UpdateRouteDTO } from './dto';
 import { LocationType } from '../location/enum/location-type.enum';
 import { Role } from 'src/auth/enum/role.enum';
 
@@ -95,6 +95,20 @@ export class RouteService {
       return res;
     } catch (error) {
       throw new ForbiddenException(error);
+    }
+  }
+  //update
+  async update(routeId: number, updateRouteDTO: UpdateRouteDTO){
+    try {
+      const res = await this.prismaService.route.update({
+        where: {
+          id: routeId
+        },
+        data: updateRouteDTO
+      })
+      return res
+    } catch (error) {
+      throw new ForbiddenException(error)
     }
   }
 }
