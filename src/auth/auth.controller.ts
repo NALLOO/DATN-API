@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ChangePassDTO, LoginDTO, RegisterDTO } from './dto';
+import { ChangePassDTO, LoginDTO, RegisterDTO, ResetPasswordDTO } from './dto';
 import { JwtAuthGuard } from './guard';
 import RequestWithUser from './interface/request-with-user.interface';
 import CustomResponse from '../helper/response/response';
@@ -30,5 +30,22 @@ export class AuthController {
       changePassData,
     );
     return new CustomResponse(res);
+  }
+  //PUT: ../auth/reset-password?token=...
+  @Put('reset-password')
+  async resetPassword(
+    @Query('token')token: string,
+    @Body()body : {newPassword: string}
+  ){
+    const res = await this.authService.resetPassword(body.newPassword, token)
+    return new CustomResponse(res)
+  }
+  //POST: ../auth/send-mail-reset
+  @Post('send-maill-reset')
+  async sendMailResetPassword(
+    @Body() body: ResetPasswordDTO
+  ){
+    const res = await this.authService.sendMailResetPassword(body.email)
+    return new CustomResponse(res)
   }
 }
