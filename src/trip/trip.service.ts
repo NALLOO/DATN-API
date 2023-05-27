@@ -1,6 +1,6 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateTripDTO, TripQueryDTO } from './dto';
+import { CreateTripDTO, TripQueryDTO, UpdateTripDTO } from './dto';
 import { trimQuery } from '../utils';
 import moment from 'moment';
 
@@ -66,6 +66,58 @@ export class TripService {
       return createTrip;
     } catch (error) {
       throw new ForbiddenException('Create Trip error!!!');
+    }
+  }
+  //
+  async detail(tripId: number){
+    try {
+      const res = await this.prismaService.trip.findUnique({
+        where: {
+          id: tripId
+        },
+        include:{
+          tickets:{
+            include:{
+              author:{
+                select:{
+                  id:true,
+                  name: true,
+                  phone: true
+                }
+              }
+            }
+          }
+        }
+      })
+      return res
+    } catch (error) {
+      throw new ForbiddenException(error)
+    }
+  }
+  //update
+  async update(tripId: number, updateTripDTO: UpdateTripDTO){
+    try {
+      const trip = await this.prismaService.trip.findUnique({
+        where: {
+          id: tripId
+        },
+        select: {
+          tickets: true
+        }
+      })
+      const ticketSold = trip.tickets.find(item => item.status === 1)
+      if (ticketSold) throw new HttpException("Can't update",HttpStatus.BAD_REQUEST)
+      else {
+        const res = await this.prismaService.trip.update({
+          where: {
+            id: tripId
+          },
+          data: updateTripDTO
+        })
+        return res
+      }
+    } catch (error) {
+      
     }
   }
 }

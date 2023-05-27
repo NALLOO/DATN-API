@@ -11,10 +11,11 @@ import {
   Param,
   Get,
   Query,
+  Put,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guard';
 import RequestWithUser from 'src/auth/interface/request-with-user.interface';
-import { CreateRouteDTO, QueryRoute } from './dto';
+import { CreateRouteDTO, QueryRoute, UpdateRouteDTO } from './dto';
 import { Role } from 'src/auth/enum/role.enum';
 import { RouteService } from './route.service';
 import CustomResponse from '../helper/response/response';
@@ -45,6 +46,16 @@ export class RouteController {
     @Param('id', ParseIntPipe) routeId: number,
   ) {
     const res = await this.routeService.delete(routeId);
+    return new CustomResponse(res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(
+    @Req() request: RequestWithUser,
+    @Param('id', ParseIntPipe) routeId: number,
+    @Body() updateRouteDTO :UpdateRouteDTO
+  ) {
+    const res = await this.routeService.update(routeId, updateRouteDTO);
     return new CustomResponse(res);
   }
   //get route

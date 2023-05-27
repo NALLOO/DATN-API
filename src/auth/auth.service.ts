@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoginDTO, RegisterDTO } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from '../mail/mail.service';
 
 @Injectable({})
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
   async register(registerDTO: RegisterDTO) {
     const hashedPassword = await argon.hash(registerDTO.password);
@@ -59,6 +61,7 @@ export class AuthService {
     if (!passwordMatched) {
       throw new ForbiddenException('Incorrect password!');
     }
+    
     delete user.password;
     const access_token = await this.convertToJwtString(user.id, user.email);
     return {
@@ -108,5 +111,63 @@ export class AuthService {
     } catch (error) {
       throw new ForbiddenException(error);
     }
+  }
+  //
+  async convertResetPasswordJwt(
+    userId: number,
+    email: string,
+  ): Promise<string> {
+    const payload = {
+      sub: userId,
+      email,
+    };
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_RESET_PASSWORD_SECRET'),
+      expiresIn: `${this.configService.get(
+        'JWT_RESET_PASSWORD_EXPIRATION_TIME',
+      )}s`,
+    });
+  }
+  //reset password
+  async sendMailResetPassword(email: string) {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (!user)
+        throw new HttpException('Email not found', HttpStatus.NOT_FOUND);
+      const token = await this.convertResetPasswordJwt(user.id, user.email);
+      const link = `${this.configService.get(
+        'FRONT_END',
+      )}/reset-password/${token}`;
+      this.mailService.sendMail(email, 'Thay đổi mật khẩu', 'resetPassword', {
+        name: user.name,
+        link,
+      });
+      return
+    } catch (error) {
+      throw new ForbiddenException(error)
+    }
+  }
+  //
+  async resetPassword(password: string, token: string){
+    try {
+      const decode = await this.jwtService.verifyAsync(token, {secret: this.configService.get('JWT_RESET_PASSWORD_SECRET')})
+      const hashedPassword = await argon.hash(password)
+      const user = await this.prismaService.user.update({
+        where:{
+          id: decode.sub
+        },
+        data: {
+          password: hashedPassword
+        }
+      })
+      return user
+    } catch (error) {
+      throw new HttpException('Token failed',HttpStatus.BAD_REQUEST)
+    }
+
   }
 }
