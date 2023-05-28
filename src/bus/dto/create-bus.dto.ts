@@ -1,12 +1,11 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateBusDTO {
   @IsNotEmpty()
   @IsNumber()
-  typeId: number
+  typeId: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  authorId: number
-
+  @IsString()
+  numberPlate: string;
 }

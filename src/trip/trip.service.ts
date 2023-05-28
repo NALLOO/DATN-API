@@ -1,8 +1,13 @@
-import { Injectable, ForbiddenException, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTripDTO, TripQueryDTO, UpdateTripDTO } from './dto';
 import { trimQuery } from '../utils';
-import moment from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class TripService {
@@ -10,33 +15,49 @@ export class TripService {
   //get list trip
   async getAll(query: TripQueryDTO) {
     const option = trimQuery({
-      startProvinceId: query.startProvince,
-      endProvinceId: query.endProvince,
+      startProvinceId: query.startProvinceId,
+      endProvinceId: query.endProvinceId,
     });
-    const dateOption = query.date ? {
-      gte: moment(query.date).format(),
-      lte: moment(query.date).add(1,'days').format()
-    } : {}
+    console.log(option);
+    const dateOption = query.date
+      ? {
+          gte: new Date(query.date).toISOString(),
+          lte: moment(query.date).add(1, 'days').toISOString(),
+        }
+      : {};
     const [total, data] = await this.prismaService.$transaction([
       this.prismaService.trip.count({
         where: {
           route: option,
-          timeStart: dateOption
+          timeStart: dateOption,
         },
       }),
       this.prismaService.trip.findMany({
-        skip: ((query.page - 1) | 0) * (query.limit | 10),
-        take: query.limit | 10,
+        skip: ((parseInt(query.page) - 1) | 0) * (parseInt(query.limit) | 10),
+        take: parseInt(query.limit) | 10,
         where: {
           route: option,
-          timeStart: dateOption
+          timeStart: dateOption,
         },
-        orderBy:{
-          price: query.orderBy ? query.orderBy : 'asc'
-        }
+        include: {
+          route: {
+            include: {
+              startProvince: true,
+              endProvince: true,
+              locations: {
+                include: {
+                  location: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          price: query.orderBy ? query.orderBy : 'asc',
+        },
       }),
     ]);
-    return {total, data};
+    return { total, data };
   }
   //create Trip
   async create(createTripDTO: CreateTripDTO) {
@@ -51,6 +72,8 @@ export class TripService {
       const createTrip = await this.prismaService.trip.create({
         data: {
           ...createTripDTO,
+          timeStart: new Date(createTripDTO.timeStart).toISOString(),
+          timeEnd: new Date(createTripDTO.timeEnd).toISOString(),
           tickets: {
             createMany: {
               data: listTicket.map((ticket: string) => {
@@ -65,59 +88,78 @@ export class TripService {
       });
       return createTrip;
     } catch (error) {
-      throw new ForbiddenException('Create Trip error!!!');
+      console.log(error);
+      throw new ForbiddenException(error);
     }
   }
   //
-  async detail(tripId: number){
+  async detail(tripId: number) {
     try {
       const res = await this.prismaService.trip.findUnique({
         where: {
-          id: tripId
+          id: tripId,
         },
-        include:{
-          tickets:{
-            include:{
-              author:{
-                select:{
-                  id:true,
+        include: {
+          bus: true,
+          route: {
+            include: {
+              startProvince: true,
+              endProvince: true,
+              locations: {
+                include: {
+                  location: true,
+                },
+              },
+            },
+          },
+          tickets: {
+            include: {
+              author: {
+                select: {
+                  id: true,
                   name: true,
-                  phone: true
-                }
-              }
-            }
-          }
-        }
-      })
-      return res
+                  phone: true,
+                },
+              },
+              startLocation: true,
+            },
+          },
+        },
+      });
+      return res;
     } catch (error) {
-      throw new ForbiddenException(error)
+      throw new ForbiddenException(error);
     }
   }
   //update
-  async update(tripId: number, updateTripDTO: UpdateTripDTO){
+  async update(tripId: number, updateTripDTO: UpdateTripDTO) {
     try {
       const trip = await this.prismaService.trip.findUnique({
         where: {
-          id: tripId
+          id: tripId,
         },
         select: {
-          tickets: true
-        }
-      })
-      const ticketSold = trip.tickets.find(item => item.status === 1)
-      if (ticketSold) throw new HttpException("Can't update",HttpStatus.BAD_REQUEST)
+          tickets: true,
+        },
+      });
+      const ticketSold = trip.tickets.find((item) => item.status === 1);
+      if (ticketSold)
+        throw new HttpException("Can't update", HttpStatus.BAD_REQUEST);
       else {
         const res = await this.prismaService.trip.update({
           where: {
-            id: tripId
+            id: tripId,
           },
-          data: updateTripDTO
-        })
-        return res
+          data: {
+            ...updateTripDTO,
+            timeStart: moment(updateTripDTO.timeStart).format('X'),
+            timeEnd: moment(updateTripDTO.timeEnd).format('X'),
+          },
+        });
+        return res;
       }
     } catch (error) {
-      
+      throw new ForbiddenException(error);
     }
   }
 }

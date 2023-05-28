@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateRouteDTO {
   @IsNotEmpty()
@@ -8,6 +8,10 @@ export class CreateRouteDTO {
   @IsNotEmpty()
   @IsNumber()
   endProvinceId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
   @IsNotEmpty()
   @IsArray()

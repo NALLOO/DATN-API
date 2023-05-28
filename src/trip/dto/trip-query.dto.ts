@@ -1,30 +1,41 @@
-import { IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { OrderByEnum } from '../enum/order-by.enum';
 
 export class TripQueryDTO {
-  @IsNumber()
+  @IsString()
+  @Matches(/^[0-9]+$/)
   @IsOptional()
-  startProvince?: number;
+  startProvinceId?: string;
 
-  @IsNumber()
+  @IsString()
+  @Matches(/^[0-9]+$/)
   @IsOptional()
-  endProvince?: number;
+  endProvinceId?: string;
 
-  @IsNumber()
+  @IsString()
+  @Matches(/^[0-9]+$/)
   @IsOptional()
-  page?: number;
+  page?: string;
 
-  @IsNumber()
+  @IsString()
+  @Matches(/^[0-9]+$/)
   @IsOptional()
-  limit?: number;
+  limit?: string;
 
   @IsString()
   @IsOptional()
   @IsEnum(OrderByEnum)
-  orderBy: OrderByEnum
+  orderBy: OrderByEnum;
 
   @IsString()
   @IsDateString()
-  date: Date
-
+  @IsOptional()
+  date: Date;
 }

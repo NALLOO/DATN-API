@@ -33,12 +33,13 @@ model BusType {
 }
 
 model Bus {
-  id       Int     @id @default(autoincrement())
-  author   User    @relation("authorBus", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId Int
-  type     BusType @relation(fields: [typeId], references: [id])
-  typeId   Int
-  trips    Trip[]
+  id          Int     @id @default(autoincrement())
+  author      User    @relation("authorBus", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    Int
+  numberPlate String
+  type        BusType @relation(fields: [typeId], references: [id])
+  typeId      Int
+  trips       Trip[]
 }
 
 model Trip {
@@ -47,7 +48,7 @@ model Trip {
   busId     Int
   route     Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
   routeId   Int
-  price     Int
+  price     String
   timeStart DateTime
   timeEnd   DateTime?
   status    Int
@@ -87,6 +88,7 @@ model Route {
   id              Int                @id @default(autoincrement())
   author          User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId        Int
+  name            String             @default("")
   trips           Trip[]
   startProvince   Province           @relation("start province", fields: [startProvinceId], references: [id], onDelete: Cascade)
   startProvinceId Int

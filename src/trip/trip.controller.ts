@@ -20,7 +20,7 @@ import RequestWithUser from '../auth/interface/request-with-user.interface';
 export class TripController {
   constructor(private tripService: TripService) {}
   //get Trip
-  @Get()
+  @Get('get')
   async getAll(@Query() query: TripQueryDTO) {
     const res = await this.tripService.getAll(query);
     return new CustomResponse(res);
@@ -40,21 +40,20 @@ export class TripController {
   @Get('detail/:id')
   async detail(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe)tripId: number
+    @Param('id', ParseIntPipe) tripId: number,
   ) {
-    const res = await this.tripService.detail(tripId)
-    return new CustomResponse(res)
+    const res = await this.tripService.detail(tripId);
+    return new CustomResponse(res);
   }
   //update trip
   @UseGuards(JwtAuthGuard)
   @Put('update/:id')
   async update(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe)tripId: number,
-    @Body()updateTripDTO :UpdateTripDTO
+    @Param('id', ParseIntPipe) tripId: number,
+    @Body() updateTripDTO: UpdateTripDTO,
   ) {
-    const res = await this.tripService.update(tripId, updateTripDTO)
-    return new CustomResponse(res)
+    const res = await this.tripService.update(tripId, updateTripDTO);
+    return new CustomResponse(res);
   }
-
 }

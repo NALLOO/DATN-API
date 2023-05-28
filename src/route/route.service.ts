@@ -1,6 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRouteDTO, QueryRoute, RouteMapLocationDTO, UpdateRouteDTO } from './dto';
+import {
+  CreateRouteDTO,
+  QueryRoute,
+  RouteMapLocationDTO,
+  UpdateRouteDTO,
+} from './dto';
 import { LocationType } from '../location/enum/location-type.enum';
 import { Role } from 'src/auth/enum/role.enum';
 
@@ -27,6 +32,7 @@ export class RouteService {
       const res = await this.prismaService.route.create({
         data: {
           authorId: authorId,
+          name: createRouteDTO.name,
           startProvinceId: createRouteDTO.startProvinceId,
           endProvinceId: createRouteDTO.endProvinceId,
           locations: {
@@ -58,6 +64,15 @@ export class RouteService {
           skip: ((parseInt(query.page) - 1) | 0) * (parseInt(query.limit) | 10),
           take: parseInt(query.limit) | 10,
           where: option,
+          include: {
+            startProvince: true,
+            endProvince: true,
+            locations: {
+              include: {
+                location: true,
+              },
+            },
+          },
         }),
       ]);
       return { total, result: res };

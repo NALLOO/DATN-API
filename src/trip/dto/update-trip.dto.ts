@@ -3,7 +3,8 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
-  IsNumber,
+  IsString,
+  Matches,
 } from 'class-validator';
 import { TripStatus } from '../enum/trip-status.enum';
 
@@ -13,12 +14,13 @@ export class UpdateTripDTO {
   busId: number;
 
   @IsOptional()
-  @IsNumber()
-  price: number;
+  @IsString()
+  @Matches(/^[0-9]+$/)
+  price: string;
 
   @IsOptional()
   @IsInt()
-  routeId: number
+  routeId: number;
 
   @IsOptional()
   @IsDateString()
@@ -30,5 +32,5 @@ export class UpdateTripDTO {
 
   @IsOptional()
   @IsEnum(TripStatus)
-  status: number
+  status: number;
 }
