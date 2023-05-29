@@ -1,19 +1,19 @@
-import { IsArray, IsOptional, IsNumber } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class UpdateRouteDTO {
   @IsOptional()
-  @IsNumber()
-  startProvinceId?: number;
+  @IsString()
+  startProvinceId?: string;
 
   @IsOptional()
-  @IsNumber()
-  endProvinceId?: number;
-
-  @IsOptional()
-  @IsArray()
-  startLocations?: Array<number>;
+  @IsString()
+  endProvinceId?: string;
 
   @IsOptional()
   @IsArray()
-  endLocations?: Array<number>;
+  startLocations?: Array<string>;
+
+  @IsOptional()
+  @IsArray()
+  endLocations?: Array<string>;
 }

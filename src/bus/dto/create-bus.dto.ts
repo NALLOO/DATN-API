@@ -2,8 +2,8 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateBusDTO {
   @IsNotEmpty()
-  @IsNumber()
-  typeId: number;
+  @IsString()
+  typeId: string;
 
   @IsNotEmpty()
   @IsString()

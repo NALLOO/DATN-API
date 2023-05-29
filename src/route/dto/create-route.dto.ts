@@ -2,12 +2,12 @@ import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateRouteDTO {
   @IsNotEmpty()
-  @IsNumber()
-  startProvinceId: number;
+  @IsString()
+  startProvinceId: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  endProvinceId: number;
+  @IsString()
+  endProvinceId: string;
 
   @IsNotEmpty()
   @IsString()
@@ -15,9 +15,9 @@ export class CreateRouteDTO {
 
   @IsNotEmpty()
   @IsArray()
-  startLocations: Array<number>;
+  startLocations: Array<string>;
 
   @IsNotEmpty()
   @IsArray()
-  endLocations: Array<number>;
+  endLocations: Array<string>;
 }

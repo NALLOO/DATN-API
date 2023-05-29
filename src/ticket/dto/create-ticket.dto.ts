@@ -7,8 +7,8 @@ export class CreateTicketDTO {
   code: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  tripId: number;
+  @IsString()
+  tripId: string;
 
   @IsNotEmpty()
   @IsEnum(TicketStatus)

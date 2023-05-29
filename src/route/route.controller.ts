@@ -43,7 +43,7 @@ export class RouteController {
   @Delete(':id')
   async delete(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) routeId: number,
+    @Param('id') routeId: string,
   ) {
     const res = await this.routeService.delete(routeId);
     return new CustomResponse(res);
@@ -52,7 +52,7 @@ export class RouteController {
   @Put(':id')
   async update(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) routeId: number,
+    @Param('id') routeId: string,
     @Body() updateRouteDTO :UpdateRouteDTO
   ) {
     const res = await this.routeService.update(routeId, updateRouteDTO);
@@ -66,7 +66,7 @@ export class RouteController {
     return new CustomResponse(res);
   }
   @Get('detail/:id')
-  async getDetail(@Param('id', ParseIntPipe) routeId: number) {
+  async getDetail(@Param('id') routeId: string) {
     const res = await this.routeService.getDetail(routeId);
     return new CustomResponse(res);
   }

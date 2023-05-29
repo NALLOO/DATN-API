@@ -18,7 +18,6 @@ export class TripService {
       startProvinceId: query.startProvinceId,
       endProvinceId: query.endProvinceId,
     });
-    console.log(option);
     const dateOption = query.date
       ? {
           gte: new Date(query.date).toISOString(),
@@ -88,12 +87,11 @@ export class TripService {
       });
       return createTrip;
     } catch (error) {
-      console.log(error);
       throw new ForbiddenException(error);
     }
   }
   //
-  async detail(tripId: number) {
+  async detail(tripId: string) {
     try {
       const res = await this.prismaService.trip.findUnique({
         where: {
@@ -132,7 +130,7 @@ export class TripService {
     }
   }
   //update
-  async update(tripId: number, updateTripDTO: UpdateTripDTO) {
+  async update(tripId: string, updateTripDTO: UpdateTripDTO) {
     try {
       const trip = await this.prismaService.trip.findUnique({
         where: {

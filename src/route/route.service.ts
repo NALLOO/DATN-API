@@ -13,7 +13,7 @@ import { Role } from 'src/auth/enum/role.enum';
 export class RouteService {
   constructor(private prismaService: PrismaService) {}
   //Create Route
-  async create(authorId: number, createRouteDTO: CreateRouteDTO) {
+  async create(authorId: string, createRouteDTO: CreateRouteDTO) {
     try {
       const listStart = createRouteDTO.startLocations.map((item) => {
         return {
@@ -81,7 +81,7 @@ export class RouteService {
     }
   }
   //delete route
-  async delete(routeId: number) {
+  async delete(routeId: string) {
     try {
       await this.prismaService.route.delete({
         where: {
@@ -91,7 +91,7 @@ export class RouteService {
     } catch (error) {}
   }
   //get detail
-  async getDetail(routeId: number) {
+  async getDetail(routeId: string) {
     try {
       const res = await this.prismaService.route.findUnique({
         where: {
@@ -113,17 +113,17 @@ export class RouteService {
     }
   }
   //update
-  async update(routeId: number, updateRouteDTO: UpdateRouteDTO){
+  async update(routeId: string, updateRouteDTO: UpdateRouteDTO) {
     try {
       const res = await this.prismaService.route.update({
         where: {
-          id: routeId
+          id: routeId,
         },
-        data: updateRouteDTO
-      })
-      return res
+        data: updateRouteDTO,
+      });
+      return res;
     } catch (error) {
-      throw new ForbiddenException(error)
+      throw new ForbiddenException(error);
     }
   }
 }

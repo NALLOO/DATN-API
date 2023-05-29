@@ -40,7 +40,7 @@ export class TripController {
   @Get('detail/:id')
   async detail(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) tripId: number,
+    @Param('id') tripId: string,
   ) {
     const res = await this.tripService.detail(tripId);
     return new CustomResponse(res);
@@ -50,7 +50,7 @@ export class TripController {
   @Put('update/:id')
   async update(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) tripId: number,
+    @Param('id') tripId: string,
     @Body() updateTripDTO: UpdateTripDTO,
   ) {
     const res = await this.tripService.update(tripId, updateTripDTO);

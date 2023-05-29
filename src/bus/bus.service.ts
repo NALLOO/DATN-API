@@ -11,7 +11,7 @@ export class BusService {
       let option = {};
       if (query.page)
         option = {
-          skip: (query.page - 1) * 10,
+          skip: (parseInt(query.page) - 1) * 10,
           take: 10,
         };
       const [total, result] = await this.prismaService.$transaction([
@@ -33,7 +33,7 @@ export class BusService {
   }
 
   //create bus
-  async create(authorId: number, createBusDTO: CreateBusDTO) {
+  async create(authorId: string, createBusDTO: CreateBusDTO) {
     try {
       const res = await this.prismaService.bus.create({
         data: { ...createBusDTO, authorId },
@@ -44,7 +44,7 @@ export class BusService {
     }
   }
   //delete bus
-  async delete(busId: number) {
+  async delete(busId: string) {
     try {
       await this.prismaService.bus.delete({
         where: {
@@ -56,7 +56,7 @@ export class BusService {
     }
   }
   //detail
-  async detail(busId: number) {
+  async detail(busId: string) {
     try {
       const res = await this.prismaService.bus.findUnique({
         where: {

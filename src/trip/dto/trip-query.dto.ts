@@ -10,12 +10,10 @@ import { OrderByEnum } from '../enum/order-by.enum';
 
 export class TripQueryDTO {
   @IsString()
-  @Matches(/^[0-9]+$/)
   @IsOptional()
   startProvinceId?: string;
 
   @IsString()
-  @Matches(/^[0-9]+$/)
   @IsOptional()
   endProvinceId?: string;
 

@@ -3,8 +3,8 @@ import { TicketStatus } from '../enum/ticket-status.enum';
 
 export class UpdateTicketDTO {
   @IsOptional()
-  @IsNumber()
-  authorId?: number;
+  @IsString()
+  authorId?: string;
 
   @IsNotEmpty()
   @IsEnum(TicketStatus)

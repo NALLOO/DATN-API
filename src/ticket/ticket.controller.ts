@@ -1,4 +1,4 @@
-import { Body, Controller, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Put } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { UpdateTicketDTO } from './dto';
 import CustomResponse from '../helper/response/response';
@@ -9,10 +9,17 @@ export class TicketController {
   //update ticket
   @Put(':id')
   async update(
-    @Param('id', ParseIntPipe) ticketId: number,
+    @Param('id') ticketId: string,
     @Body() updateTicketDTO: UpdateTicketDTO,
   ) {
     const res = await this.ticketService.update(ticketId, updateTicketDTO)
+    return new CustomResponse(res)
+  }
+  @Get(':id')
+  async detail(
+    @Param('id') ticketId: string
+  ) {
+    const res = await this.ticketService.detail(ticketId)
     return new CustomResponse(res)
   }
 }

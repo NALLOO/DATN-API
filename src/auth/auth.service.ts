@@ -70,7 +70,7 @@ export class AuthService {
     };
   }
   // register token
-  async convertToJwtString(userId: number, email: string): Promise<string> {
+  async convertToJwtString(userId: string, email: string): Promise<string> {
     const payload = {
       sub: userId,
       email,
@@ -83,7 +83,7 @@ export class AuthService {
     });
   }
   //change password
-  async changePassword(userId: number, changePassData: ChangePassDTO) {
+  async changePassword(userId: string, changePassData: ChangePassDTO) {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: userId,
@@ -114,7 +114,7 @@ export class AuthService {
   }
   //
   async convertResetPasswordJwt(
-    userId: number,
+    userId: string,
     email: string,
   ): Promise<string> {
     const payload = {

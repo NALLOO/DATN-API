@@ -60,7 +60,7 @@ export class BusController {
   @Delete(':id')
   async delete(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) busId: number,
+    @Param('id') busId: string,
   ) {
     const role = request.user.role;
     if (role !== Role.ADMIN)
@@ -73,7 +73,7 @@ export class BusController {
     return new CustomResponse(res);
   }
   @Get('detail/:id')
-  async detail(@Param('id', ParseIntPipe) busId: number) {
+  async detail(@Param('id') busId: string) {
     const res = await this.busService.detail(busId);
     return new CustomResponse(res);
   }

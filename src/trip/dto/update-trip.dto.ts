@@ -10,8 +10,8 @@ import { TripStatus } from '../enum/trip-status.enum';
 
 export class UpdateTripDTO {
   @IsOptional()
-  @IsInt()
-  busId: number;
+  @IsString()
+  busId: string;
 
   @IsOptional()
   @IsString()
@@ -19,8 +19,8 @@ export class UpdateTripDTO {
   price: string;
 
   @IsOptional()
-  @IsInt()
-  routeId: number;
+  @IsString()
+  routeId: string;
 
   @IsOptional()
   @IsDateString()
