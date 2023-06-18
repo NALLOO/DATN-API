@@ -23,7 +23,7 @@ export class LocationService {
     }
   }
   //delete location
-  async delete(locationId: number) {
+  async delete(locationId: string) {
     try {
       await this.prismaService.location.delete({
         where: {
@@ -36,13 +36,13 @@ export class LocationService {
     }
   }
   // get location by provinceId
-  async getLocation(provinceId: any, page: any) {
+  async getLocation(provinceId: string, page: any) {
     try {
       let option = {};
       let pagination = {};
       if (provinceId)
         option = {
-          provinceId: parseInt(provinceId),
+          provinceId: provinceId,
         };
       if (page) {
         pagination = {
@@ -69,7 +69,7 @@ export class LocationService {
     }
   }
   //get detail
-  async getDetail(locationId: number) {
+  async getDetail(locationId: string) {
     try {
       const res = await this.prismaService.location.findUnique({
         where: {
@@ -85,7 +85,7 @@ export class LocationService {
     }
   }
   //update
-  async update(locationId: number, updateLocationDTO: UpdateLocationDTO) {
+  async update(locationId: string, updateLocationDTO: UpdateLocationDTO) {
     try {
       const res = await this.prismaService.location.update({
         where: {

@@ -6,28 +6,37 @@ import { CreateBusDTO } from './dto';
 export class BusService {
   constructor(private prismaService: PrismaService) {}
   //get all
-  async getAll() {
+  async getAll(query: any) {
     try {
-      const [total, data] = await this.prismaService.$transaction([
-        this.prismaService.bus.count(),
+      let option = {};
+      if (query.page)
+        option = {
+          skip: (parseInt(query.page) - 1) * 10,
+          take: 10,
+        };
+      const [total, result] = await this.prismaService.$transaction([
+        this.prismaService.bus.count({
+          ...option,
+        }),
         this.prismaService.bus.findMany({
+          ...option,
           include: {
             author: true,
             type: true,
           },
         }),
       ]);
-      return { total, data };
+      return { total, result };
     } catch (error) {
       throw new ForbiddenException(error);
     }
   }
 
   //create bus
-  async create(createBusDTO: CreateBusDTO) {
+  async create(authorId: string, createBusDTO: CreateBusDTO) {
     try {
       const res = await this.prismaService.bus.create({
-        data: createBusDTO,
+        data: { ...createBusDTO, authorId },
       });
       return res;
     } catch (error) {
@@ -35,13 +44,29 @@ export class BusService {
     }
   }
   //delete bus
-  async delete(busId: number) {
+  async delete(busId: string) {
     try {
       await this.prismaService.bus.delete({
         where: {
           id: busId,
         },
       });
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
+  }
+  //detail
+  async detail(busId: string) {
+    try {
+      const res = await this.prismaService.bus.findUnique({
+        where: {
+          id: busId,
+        },
+        include: {
+          type: true,
+        },
+      });
+      return res;
     } catch (error) {
       throw new ForbiddenException(error);
     }

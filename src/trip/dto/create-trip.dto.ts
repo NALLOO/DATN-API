@@ -1,25 +1,26 @@
 import {
   IsDateString,
   IsEnum,
-  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
+  IsString,
+  Matches,
 } from 'class-validator';
 import { TripStatus } from '../enum/trip-status.enum';
 
 export class CreateTripDTO {
   @IsNotEmpty()
-  @IsInt()
-  busId: number;
+  @IsString()
+  busId: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  price: number;
+  @IsString()
+  @Matches(/^[0-9]+$/)
+  price: string;
 
   @IsNotEmpty()
-  @IsInt()
-  routeId: number
+  @IsString()
+  routeId: string;
 
   @IsNotEmpty()
   @IsDateString()
@@ -31,5 +32,5 @@ export class CreateTripDTO {
 
   @IsNotEmpty()
   @IsEnum(TripStatus)
-  status: number
+  status: number;
 }

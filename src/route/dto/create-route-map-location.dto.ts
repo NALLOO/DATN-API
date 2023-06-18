@@ -1,4 +1,4 @@
 export interface RouteMapLocationDTO {
-  locationId: number,
+  locationId: string,
   type: number
 }

@@ -51,7 +51,7 @@ export class BusTypeController {
   @Put(':id')
   async update(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) typeId: number,
+    @Param('id') typeId: string,
     @Body() updateBusTypeDTO: UpdateBusTypeDTO,
   ) {
     if (request.user.role !== Role.ADMIN)
@@ -66,10 +66,7 @@ export class BusTypeController {
   //Post: ../bus-type/update/id
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(
-    @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) typeId: number,
-  ) {
+  async delete(@Req() request: RequestWithUser, @Param('id') typeId: string) {
     if (request.user.role !== Role.ADMIN)
       throw new HttpException('error', HttpStatus.PRECONDITION_FAILED);
     const res = await this.busTypeService.delete(typeId);

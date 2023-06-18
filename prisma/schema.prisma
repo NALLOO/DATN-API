@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   email     String   @unique()
   password  String
   phone     String
@@ -25,7 +25,7 @@ model User {
 }
 
 model BusType {
-  id           Int    @id @default(autoincrement())
+  id           String @id @default(uuid())
   name         String @unique()
   numberOfSeat Int
   listTicket   String
@@ -33,21 +33,22 @@ model BusType {
 }
 
 model Bus {
-  id       Int     @id @default(autoincrement())
-  author   User    @relation("authorBus", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId Int
-  type     BusType @relation(fields: [typeId], references: [id])
-  typeId   Int
-  trips    Trip[]
+  id          String  @id @default(uuid())
+  author      User    @relation("authorBus", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  numberPlate String
+  type        BusType @relation(fields: [typeId], references: [id])
+  typeId      String
+  trips       Trip[]
 }
 
 model Trip {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   bus       Bus       @relation(fields: [busId], references: [id], onDelete: Cascade)
-  busId     Int
+  busId     String
   route     Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  routeId   Int
-  price     Int
+  routeId   String
+  price     String
   timeStart DateTime
   timeEnd   DateTime?
   status    Int
@@ -55,19 +56,19 @@ model Trip {
 }
 
 model Ticket {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(uuid())
   code            String
   trip            Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  tripId          Int
-  startLocationId Int?
+  tripId          String
+  startLocationId String?
   startLocation   Location? @relation(fields: [startLocationId], references: [id])
   author          User?     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId        Int?
+  authorId        String?
   status          Int
 }
 
 model Province {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(uuid())
   name      String
   start     Route[]    @relation("start province")
   end       Route[]    @relation("end province")
@@ -75,31 +76,32 @@ model Province {
 }
 
 model Location {
-  id         Int                @id @default(autoincrement())
+  id         String             @id @default(uuid())
   name       String
   ticket     Ticket[]
   province   Province           @relation(fields: [provinceId], references: [id], onDelete: Cascade)
-  provinceId Int
+  provinceId String
   routes     RouteMapLocation[]
 }
 
 model Route {
-  id              Int                @id @default(autoincrement())
+  id              String             @id @default(uuid())
   author          User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId        Int
+  authorId        String
+  name            String             @default("")
   trips           Trip[]
   startProvince   Province           @relation("start province", fields: [startProvinceId], references: [id], onDelete: Cascade)
-  startProvinceId Int
+  startProvinceId String
   endProvince     Province           @relation("end province", fields: [endProvinceId], references: [id], onDelete: Cascade)
-  endProvinceId   Int
+  endProvinceId   String
   locations       RouteMapLocation[]
 }
 
 model RouteMapLocation {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid())
   route      Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  routeId    Int
+  routeId    String
   location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  locationId Int
+  locationId String
   type       Int
 }

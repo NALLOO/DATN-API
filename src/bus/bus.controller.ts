@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -35,14 +36,14 @@ export class BusController {
         "You don't have permission",
         HttpStatus.PRECONDITION_FAILED,
       );
-    const res = await this.busService.create(createBusDTO);
+    const res = await this.busService.create(request.user.id, createBusDTO);
     return new CustomResponse(res);
   }
 
   // get all bus
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAll(@Req() request: RequestWithUser) {
+  async getAll(@Req() request: RequestWithUser, @Query() query: any) {
     const role = request.user.role;
     if (role !== Role.ADMIN)
       throw new HttpException(
@@ -50,7 +51,7 @@ export class BusController {
         HttpStatus.PRECONDITION_FAILED,
       );
 
-    const res = await this.busService.getAll();
+    const res = await this.busService.getAll(query);
     return new CustomResponse(res);
   }
   //
@@ -59,7 +60,7 @@ export class BusController {
   @Delete(':id')
   async delete(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) busId: number,
+    @Param('id') busId: string,
   ) {
     const role = request.user.role;
     if (role !== Role.ADMIN)
@@ -69,6 +70,11 @@ export class BusController {
       );
 
     const res = await this.busService.delete(busId);
+    return new CustomResponse(res);
+  }
+  @Get('detail/:id')
+  async detail(@Param('id') busId: string) {
+    const res = await this.busService.detail(busId);
     return new CustomResponse(res);
   }
 }

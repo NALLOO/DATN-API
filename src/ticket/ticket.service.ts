@@ -7,8 +7,8 @@ import { MailService } from '../mail/mail.service';
 export class TicketService {
   constructor(
     private prismaService: PrismaService,
-    private mailService : MailService
-    ) {}
+    private mailService: MailService,
+  ) {}
   //create ticket
   async create(createTicketDto: CreateTicketDTO[]) {
     try {
@@ -21,7 +21,7 @@ export class TicketService {
     }
   }
   //update ticket
-  async update(ticketId: number, updateTicketDTO: UpdateTicketDTO) {
+  async update(ticketId: string, updateTicketDTO: UpdateTicketDTO) {
     try {
       const res = await this.prismaService.ticket.update({
         where: {
@@ -34,12 +34,12 @@ export class TicketService {
               route: {
                 include: {
                   startProvince: true,
-                  endProvince: true
-                }
-              }
+                  endProvince: true,
+                },
+              },
             },
           },
-          startLocation: true
+          startLocation: true,
         },
       });
       if (updateTicketDTO.authorId) {
@@ -53,13 +53,40 @@ export class TicketService {
           start: res.trip.route.startProvince.name,
           end: res.trip.route.endProvince.name,
           code: res.code,
-          location: res.startLocation.name
-        }
-        this.mailService.sendMail(user.email, 'Đặt vé xe khách thành công','getTicket',context)
+          location: res.startLocation.name,
+        };
+        this.mailService.sendMail(
+          user.email,
+          'Đặt vé xe khách thành công',
+          'getTicket',
+          context,
+        );
       }
       return res;
     } catch (error) {
       throw new ForbiddenException('update error');
+    }
+  }
+  async detail(ticketId: string) {
+    try {
+      const res = await this.prismaService.ticket.findUnique({
+        where: {
+          id: ticketId,
+        },
+        include: {
+          startLocation: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
+        },
+      });
+      return res;
+    } catch (error) {
+      throw new ForbiddenException(error);
     }
   }
 }

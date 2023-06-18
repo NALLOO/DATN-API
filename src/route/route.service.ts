@@ -1,6 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRouteDTO, QueryRoute, RouteMapLocationDTO, UpdateRouteDTO } from './dto';
+import {
+  CreateRouteDTO,
+  QueryRoute,
+  RouteMapLocationDTO,
+  UpdateRouteDTO,
+} from './dto';
 import { LocationType } from '../location/enum/location-type.enum';
 import { Role } from 'src/auth/enum/role.enum';
 
@@ -8,7 +13,7 @@ import { Role } from 'src/auth/enum/role.enum';
 export class RouteService {
   constructor(private prismaService: PrismaService) {}
   //Create Route
-  async create(authorId: number, createRouteDTO: CreateRouteDTO) {
+  async create(authorId: string, createRouteDTO: CreateRouteDTO) {
     try {
       const listStart = createRouteDTO.startLocations.map((item) => {
         return {
@@ -27,6 +32,7 @@ export class RouteService {
       const res = await this.prismaService.route.create({
         data: {
           authorId: authorId,
+          name: createRouteDTO.name,
           startProvinceId: createRouteDTO.startProvinceId,
           endProvinceId: createRouteDTO.endProvinceId,
           locations: {
@@ -58,6 +64,15 @@ export class RouteService {
           skip: ((parseInt(query.page) - 1) | 0) * (parseInt(query.limit) | 10),
           take: parseInt(query.limit) | 10,
           where: option,
+          include: {
+            startProvince: true,
+            endProvince: true,
+            locations: {
+              include: {
+                location: true,
+              },
+            },
+          },
         }),
       ]);
       return { total, result: res };
@@ -66,7 +81,7 @@ export class RouteService {
     }
   }
   //delete route
-  async delete(routeId: number) {
+  async delete(routeId: string) {
     try {
       await this.prismaService.route.delete({
         where: {
@@ -76,7 +91,7 @@ export class RouteService {
     } catch (error) {}
   }
   //get detail
-  async getDetail(routeId: number) {
+  async getDetail(routeId: string) {
     try {
       const res = await this.prismaService.route.findUnique({
         where: {
@@ -98,17 +113,17 @@ export class RouteService {
     }
   }
   //update
-  async update(routeId: number, updateRouteDTO: UpdateRouteDTO){
+  async update(routeId: string, updateRouteDTO: UpdateRouteDTO) {
     try {
       const res = await this.prismaService.route.update({
         where: {
-          id: routeId
+          id: routeId,
         },
-        data: updateRouteDTO
-      })
-      return res
+        data: updateRouteDTO,
+      });
+      return res;
     } catch (error) {
-      throw new ForbiddenException(error)
+      throw new ForbiddenException(error);
     }
   }
 }

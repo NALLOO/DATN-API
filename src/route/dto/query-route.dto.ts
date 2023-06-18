@@ -1,9 +1,10 @@
-import { IsInt, IsOptional } from 'class-validator';
+import { IsInt, IsOptional, IsString, Matches } from 'class-validator';
 
 export class QueryRoute {
   @IsOptional()
-  @IsInt()
-  page: number;
+  @Matches(/^[0-9]+$/)
+  @IsString()
+  page: string;
 
   @IsOptional()
   @IsInt()

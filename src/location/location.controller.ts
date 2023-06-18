@@ -44,7 +44,7 @@ export class LocationController {
   @Delete(':id')
   async delete(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) locationId: number,
+    @Param('id') locationId: string,
   ) {
     if (request.user.role !== Role.ADMIN)
       throw new HttpException(
@@ -56,14 +56,14 @@ export class LocationController {
   }
   @Get('get')
   async getLocation(
-    @Query('provinceId') provinceId?: any,
+    @Query('provinceId') provinceId?: string,
     @Query('page') page?: any,
   ) {
     const res = await this.locationService.getLocation(provinceId, page);
     return new CustomResponse(res);
   }
   @Get('detail/:id')
-  async getDetail(@Param('id', ParseIntPipe) locationId: number) {
+  async getDetail(@Param('id') locationId: string) {
     const res = await this.locationService.getDetail(locationId);
     return new CustomResponse(res);
   }
@@ -71,7 +71,7 @@ export class LocationController {
   @Put('update/:id')
   async update(
     @Req() request: RequestWithUser,
-    @Param('id', ParseIntPipe) locationId: number,
+    @Param('id') locationId: string,
     @Body() updateLocationDTO: UpdateLocationDTO,
   ) {
     if (request.user.role === Role.USER)

@@ -13,11 +13,11 @@ export class BusTypeService {
   //get all bus type
   async getAll() {
     const data = await this.prismaService.busType.findMany({});
-    return data.map(item => {
+    return data.map((item) => {
       return {
         ...item,
-        listTicket: JSON.parse(item.listTicket)
-      }
+        listTicket: JSON.parse(item.listTicket),
+      };
     });
   }
   //create bus type
@@ -34,7 +34,7 @@ export class BusTypeService {
     }
   }
   //update bus type
-  async update(typeId: number, updateBusTypeDTO: UpdateBusTypeDTO) {
+  async update(typeId: string, updateBusTypeDTO: UpdateBusTypeDTO) {
     try {
       const res = await this.prismaService.busType.update({
         where: {
@@ -47,14 +47,13 @@ export class BusTypeService {
       if (error.code === 'P2002') {
         throw new ForbiddenException('Type name has been used');
       }
-      console.log(error);
       throw new HttpException('error', HttpStatus.BAD_REQUEST, {
         cause: error,
       });
     }
   }
   // delete bus type
-  async delete(typeId: number) {
+  async delete(typeId: string) {
     try {
       this.prismaService.busType.delete({
         where: {
