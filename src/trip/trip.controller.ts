@@ -36,12 +36,9 @@ export class TripController {
     return new CustomResponse(res);
   }
   //detail trip
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('detail/:id')
-  async detail(
-    @Req() request: RequestWithUser,
-    @Param('id') tripId: string,
-  ) {
+  async detail(@Req() request: RequestWithUser, @Param('id') tripId: string) {
     const res = await this.tripService.detail(tripId);
     return new CustomResponse(res);
   }

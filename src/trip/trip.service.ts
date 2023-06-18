@@ -20,7 +20,7 @@ export class TripService {
     });
     const dateOption = query.date
       ? {
-          gte: new Date(query.date).toISOString(),
+          gte: moment(query.date).toISOString(),
           lte: moment(query.date).add(1, 'days').toISOString(),
         }
       : {};
@@ -39,6 +39,12 @@ export class TripService {
           timeStart: dateOption,
         },
         include: {
+          bus: {
+            include: {
+              type: true,
+              author: true,
+            },
+          },
           route: {
             include: {
               startProvince: true,
@@ -98,7 +104,12 @@ export class TripService {
           id: tripId,
         },
         include: {
-          bus: true,
+          bus: {
+            include: {
+              author: true,
+              type: true,
+            },
+          },
           route: {
             include: {
               startProvince: true,
