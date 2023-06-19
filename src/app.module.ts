@@ -13,6 +13,8 @@ import { RouteModule } from './route/route.module';
 import { LocationModule } from './location/location.module';
 import { ProvinceModule } from './province/province.module';
 import { MailModule } from './mail/mail.module';
+import { StripeModule } from './stripe/stripe.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { MailModule } from './mail/mail.module';
     }),
     UserModule, 
     AuthModule, 
-    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule, ProvinceModule, MailModule
+    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule, ProvinceModule, MailModule, StripeModule, OrderModule
   ],
   controllers: [AppController],
   providers: [AppService],
