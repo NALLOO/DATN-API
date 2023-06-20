@@ -62,6 +62,11 @@ export class RouteController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getAll(@Req() request: RequestWithUser, @Query() query: any) {
+    if (request.user.role === Role.USER)
+      throw new HttpException(
+        "You don't have permission",
+        HttpStatus.PRECONDITION_FAILED,
+      );
     const res = await this.routeService.getAll(request.user, query);
     return new CustomResponse(res);
   }

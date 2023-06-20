@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -15,6 +17,7 @@ import { CreateTripDTO, TripQueryDTO, UpdateTripDTO } from './dto';
 import CustomResponse from '../helper/response/response';
 import { JwtAuthGuard } from '../auth/guard';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { Role } from 'src/auth/enum/role.enum';
 
 @Controller('trip')
 export class TripController {
@@ -24,6 +27,15 @@ export class TripController {
   async getAll(@Query() query: TripQueryDTO) {
     const res = await this.tripService.getAll(query);
     return new CustomResponse(res);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-trip')
+  async getMyTrip(@Req() request: RequestWithUser,
+  @Query('page', ParseIntPipe) page: number) {
+    if (request.user.role !== Role.COACH) throw new HttpException('unAuthorize',HttpStatus.UNAUTHORIZED)
+    const res = await this.tripService.getMyTrip(request.user.id, page)
+    return new CustomResponse(res)
   }
   //create Trip
   @UseGuards(JwtAuthGuard)

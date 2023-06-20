@@ -132,6 +132,10 @@ export class TripService {
               },
               startLocation: true,
             },
+            orderBy: {
+              status: 'asc',
+              code: 'asc',
+            },
           },
         },
       });
@@ -140,7 +144,7 @@ export class TripService {
       throw new ForbiddenException(error);
     }
   }
-  //update
+
   async update(tripId: string, updateTripDTO: UpdateTripDTO) {
     try {
       const trip = await this.prismaService.trip.findUnique({
@@ -167,6 +171,32 @@ export class TripService {
         });
         return res;
       }
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
+  }
+
+  // Get my trip
+
+  async getMyTrip(userId: string, page: number) {
+    try {
+      const res = await this.prismaService.trip.findMany({
+        take: 10,
+        skip: page ? (page - 1) * 10 : 0,
+        where: {
+          bus: {
+            authorId: userId,
+          },
+        },
+      });
+      const total = await this.prismaService.trip.count({
+        where: {
+          bus: {
+            authorId: userId,
+          },
+        },
+      });
+      return { result: res, total };
     } catch (error) {
       throw new ForbiddenException(error);
     }

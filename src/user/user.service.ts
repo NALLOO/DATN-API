@@ -1,6 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateUserDTO } from './dto';
+import { Role } from 'src/auth/enum/role.enum';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,19 @@ export class UserService {
       return user;
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async getCoach(){
+    try {
+      const res = await this.prismaService.user.findMany({
+        where: {
+          role: Role.COACH
+        }
+      })
+      return res
+    } catch (error) {
+      throw new ForbiddenException(error)
     }
   }
 }

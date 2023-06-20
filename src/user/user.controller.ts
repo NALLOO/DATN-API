@@ -37,6 +37,14 @@ export class UserController {
     return new CustomResponse(data, true);
   }
 
+  @Get('coach')
+  async getCoach(
+  ) {
+    const res = await this.userService.getCoach()
+
+    return new CustomResponse(res)
+  }
+
   @UseGuards(JwtAuthGuard)
   @Put('update')
   async update(

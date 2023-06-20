@@ -15,6 +15,7 @@ import { ProvinceModule } from './province/province.module';
 import { MailModule } from './mail/mail.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrderModule } from './order/order.module';
+import { StatisticModule } from './statistic/statistic.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { OrderModule } from './order/order.module';
     }),
     UserModule, 
     AuthModule, 
-    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule, ProvinceModule, MailModule, StripeModule, OrderModule
+    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule, ProvinceModule, MailModule, StripeModule, OrderModule, StatisticModule
   ],
   controllers: [AppController],
   providers: [AppService],
