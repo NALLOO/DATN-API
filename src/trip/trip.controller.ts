@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -15,6 +17,7 @@ import { CreateTripDTO, TripQueryDTO, UpdateTripDTO } from './dto';
 import CustomResponse from '../helper/response/response';
 import { JwtAuthGuard } from '../auth/guard';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { Role } from 'src/auth/enum/role.enum';
 
 @Controller('trip')
 export class TripController {
@@ -23,6 +26,17 @@ export class TripController {
   @Get('get')
   async getAll(@Query() query: TripQueryDTO) {
     const res = await this.tripService.getAll(query);
+    return new CustomResponse(res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('mine')
+  async myTrip(@Req() request: RequestWithUser, @Query() query: TripQueryDTO) {
+    if (request.user.role === Role.USER)
+      throw new HttpException(
+        "don't have permission",
+        HttpStatus.PRECONDITION_FAILED,
+      );
+    const res = await this.tripService.myTrip(request.user.id, query);
     return new CustomResponse(res);
   }
   //create Trip
