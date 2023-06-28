@@ -1,3 +1,4 @@
+import { FirebaseService } from './firebase/firebase.service';
 import {
   Controller,
   Get,
@@ -8,10 +9,14 @@ import {
 import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { imageStorageOption } from './helper/upload/image-file-storage';
+import CustomResponse from './helper/response/response';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private firebaseService: FirebaseService,
+  ) {}
 
   @Get()
   getHello(): string {
@@ -20,6 +25,11 @@ export class AppController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', imageStorageOption))
   async upload(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+    try {
+      const res = await this.firebaseService.uploadFile(file, 'bus');
+      return new CustomResponse(res)
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

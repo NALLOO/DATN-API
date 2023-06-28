@@ -13,10 +13,14 @@ import {
   Post,
   Put,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateBusTypeDTO, UpdateBusTypeDTO } from './dto';
 import { Role } from '../auth/enum/role.enum';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { imageStorageOption } from 'src/helper/upload/image-file-storage';
 
 @Controller('bus-type')
 export class BusTypeController {
@@ -32,33 +36,37 @@ export class BusTypeController {
   //Post: ../bus-type/create
   @UseGuards(JwtAuthGuard)
   @Post('create')
+  @UseInterceptors(FileInterceptor('file',imageStorageOption))
   async create(
     @Req() request: RequestWithUser,
     @Body() createBusTypeDTO: CreateBusTypeDTO,
+    @UploadedFile() file: Express.Multer.File
   ) {
     if (request.user.role !== Role.ADMIN)
       throw new HttpException(
         "You don't have permission",
         HttpStatus.PRECONDITION_FAILED,
       );
-    const res = await this.busTypeService.create(createBusTypeDTO);
+    const res = await this.busTypeService.create(createBusTypeDTO, file);
     return new CustomResponse(res);
   }
   //update bus type
   //Post: ../bus-type/update/id
   @UseGuards(JwtAuthGuard)
   @Put(':id')
+  @UseInterceptors(FileInterceptor('file',imageStorageOption))
   async update(
     @Req() request: RequestWithUser,
     @Param('id') typeId: string,
     @Body() updateBusTypeDTO: UpdateBusTypeDTO,
+    @UploadedFile() file?: Express.Multer.File
   ) {
     if (request.user.role !== Role.ADMIN)
       throw new HttpException(
         "You don't have permission",
         HttpStatus.PRECONDITION_FAILED,
       );
-    const res = await this.busTypeService.update(typeId, updateBusTypeDTO);
+    const res = await this.busTypeService.update(typeId, updateBusTypeDTO, file);
     return new CustomResponse(res);
   }
   //update bus type

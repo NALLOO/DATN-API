@@ -5,7 +5,6 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -23,11 +22,15 @@ import { Role } from 'src/auth/enum/role.enum';
 export class TripController {
   constructor(private tripService: TripService) {}
   //get Trip
+  //GET: ../trip/get
   @Get('get')
   async getAll(@Query() query: TripQueryDTO) {
     const res = await this.tripService.getAll(query);
     return new CustomResponse(res);
   }
+  
+  //get my trip
+  //GET: ../trip/mine
   @UseGuards(JwtAuthGuard)
   @Get('mine')
   async myTrip(@Req() request: RequestWithUser, @Query() query: TripQueryDTO) {
@@ -39,7 +42,9 @@ export class TripController {
     const res = await this.tripService.myTrip(request.user.id, query);
     return new CustomResponse(res);
   }
+
   //create Trip
+  //POST: ../trip/create
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(
@@ -49,14 +54,17 @@ export class TripController {
     const res = await this.tripService.create(createTripDTO);
     return new CustomResponse(res);
   }
+
   //detail trip
-  // @UseGuards(JwtAuthGuard)
+  //GET: ../trip/detail/:id
   @Get('detail/:id')
   async detail(@Req() request: RequestWithUser, @Param('id') tripId: string) {
     const res = await this.tripService.detail(tripId);
     return new CustomResponse(res);
   }
+
   //update trip
+  //PUT: ../trip/update/:id
   @UseGuards(JwtAuthGuard)
   @Put('update/:id')
   async update(

@@ -1,6 +1,6 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsPhoneNumber, IsString } from "class-validator"
+import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from "class-validator"
 
-export class  RegisterDTO {
+export class  CreateCoachDTO {
   @IsEmail()
   @IsNotEmpty()
   email: string
@@ -19,4 +19,5 @@ export class  RegisterDTO {
     message: 'phone field must be a phone number'
   })
   phone: string
+
 }

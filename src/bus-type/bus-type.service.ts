@@ -1,3 +1,4 @@
+import { FirebaseService } from './../firebase/firebase.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   ForbiddenException,
@@ -9,7 +10,10 @@ import { CreateBusTypeDTO, UpdateBusTypeDTO } from './dto';
 
 @Injectable()
 export class BusTypeService {
-  constructor(public prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private firebaseService: FirebaseService,
+  ) {}
   //get all bus type
   async getAll() {
     const data = await this.prismaService.busType.findMany({});
@@ -21,35 +25,70 @@ export class BusTypeService {
     });
   }
   //create bus type
-  async create(createBusTypeDTO: CreateBusTypeDTO) {
+  async create(createBusTypeDTO: CreateBusTypeDTO, file: Express.Multer.File) {
     try {
+      const link = await this.firebaseService.uploadFile(file, 'bus');
+      const data = {
+        ...createBusTypeDTO,
+        image: link,
+        numberOfSeat: parseInt(createBusTypeDTO.numberOfSeat),
+      };
       const res = await this.prismaService.busType.create({
-        data: createBusTypeDTO,
+        data,
       });
       return res;
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ForbiddenException('Type name has been used');
-      } else throw new HttpException(error, HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          {
+            errors: {
+              name: 'Tên đã được sử dụng',
+            },
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      } else throw new HttpException({ error }, HttpStatus.BAD_REQUEST);
     }
   }
   //update bus type
-  async update(typeId: string, updateBusTypeDTO: UpdateBusTypeDTO) {
+  async update(
+    typeId: string,
+    updateBusTypeDTO: UpdateBusTypeDTO,
+    file?: Express.Multer.File,
+  ) {
     try {
+      let link: string;
+      if (file) {
+        link = await this.firebaseService.uploadFile(file, 'bus');
+      }
       const res = await this.prismaService.busType.update({
         where: {
           id: typeId,
         },
-        data: updateBusTypeDTO,
+        data: file
+          ? {
+              ...updateBusTypeDTO,
+              image: link,
+              numberOfSeat: parseInt(updateBusTypeDTO.numberOfSeat),
+            }
+          : {
+              ...updateBusTypeDTO,
+              numberOfSeat: parseInt(updateBusTypeDTO.numberOfSeat),
+            },
       });
       return res;
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ForbiddenException('Type name has been used');
+        throw new HttpException(
+          {
+            errors: {
+              name: 'Tên đã được sử dụng',
+            },
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
-      throw new HttpException('error', HttpStatus.BAD_REQUEST, {
-        cause: error,
-      });
+      throw new HttpException({ error }, HttpStatus.BAD_REQUEST);
     }
   }
   // delete bus type

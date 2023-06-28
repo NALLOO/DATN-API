@@ -7,6 +7,7 @@ import CustomResponse from '../helper/response/response';
 export class TicketController {
   constructor(private ticketService: TicketService) {}
   //update ticket
+  //PUT: ../ticket/:id
   @Put(':id')
   async update(
     @Param('id') ticketId: string,
@@ -15,6 +16,9 @@ export class TicketController {
     const res = await this.ticketService.update(ticketId, updateTicketDTO)
     return new CustomResponse(res)
   }
+
+  //get ticket
+  //GET: ../ticket/:id
   @Get(':id')
   async detail(
     @Param('id') ticketId: string
