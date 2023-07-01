@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Matches } from "class-validator";
 
 export class CreateBusTypeDTO{
   @IsNotEmpty()
@@ -6,8 +6,9 @@ export class CreateBusTypeDTO{
   name: string
 
   @IsNotEmpty()
-  @IsNumber()
-  numberOfSeat: number
+  @IsString()
+  @Matches(/^[0-9]+$/)
+  numberOfSeat: string
 
   @IsNotEmpty()
   @IsString()

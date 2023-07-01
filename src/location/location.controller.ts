@@ -25,6 +25,7 @@ import { UpdateLocationDTO } from './dto/update-location.dto';
 export class LocationController {
   constructor(private locationService: LocationService) {}
   // create location
+  //POST: ../location/create
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(
@@ -40,6 +41,7 @@ export class LocationController {
     return new CustomResponse(res);
   }
   //delete location
+  //DELETE: ../location/:id
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(
@@ -54,6 +56,7 @@ export class LocationController {
     const res = await this.locationService.delete(locationId);
     return new CustomResponse(res);
   }
+  //GET: ../location/get
   @Get('get')
   async getLocation(
     @Query('provinceId') provinceId?: string,
@@ -67,6 +70,8 @@ export class LocationController {
     const res = await this.locationService.getDetail(locationId);
     return new CustomResponse(res);
   }
+  
+  //PUT: ../location/update/:id
   @UseGuards(JwtAuthGuard)
   @Put('update/:id')
   async update(

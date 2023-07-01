@@ -16,15 +16,28 @@ import { MailModule } from './mail/mail.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrderModule } from './order/order.module';
 import { StatisticModule } from './statistic/statistic.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
-    UserModule, 
-    AuthModule, 
-    PrismaModule, BusTypeModule, BusModule, TicketModule, TripModule, RouteModule, LocationModule, ProvinceModule, MailModule, StripeModule, OrderModule, StatisticModule
+    UserModule,
+    AuthModule,
+    PrismaModule,
+    BusTypeModule,
+    BusModule,
+    TicketModule,
+    TripModule,
+    RouteModule,
+    LocationModule,
+    ProvinceModule,
+    MailModule,
+    StripeModule,
+    OrderModule,
+    StatisticModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

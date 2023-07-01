@@ -6,6 +6,7 @@ import CustomResponse from '../helper/response/response';
 export class ProvinceController {
   constructor(private provinceService: ProvinceService) {}
   //getAll
+  //GET: ../province
   @Get()
   async getAll() {
     const res = await this.provinceService.getAll();
