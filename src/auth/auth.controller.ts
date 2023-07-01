@@ -39,19 +39,22 @@ export class AuthController {
     );
     return new CustomResponse(res);
   }
-  //PUT: ../auth/reset-password?token=...
-  @Put('reset-password')
-  async resetPassword(
-    @Query('token') token: string,
-    @Body() body: { newPassword: string },
-  ) {
-    const res = await this.authService.resetPassword(body.newPassword, token);
+  //POST: ../auth/reset-password?token=...
+  @Post('reset-password')
+  async resetPassword(@Body() body: { password: string; token: string }) {
+    const res = await this.authService.resetPassword(body.password, body.token);
     return new CustomResponse(res);
   }
   //POST: ../auth/send-mail-reset
-  @Post('send-maill-reset')
+  @Post('send-mail-reset')
   async sendMailResetPassword(@Body() body: ResetPasswordDTO) {
     const res = await this.authService.sendMailResetPassword(body.email);
+    return new CustomResponse(res);
+  }
+  //POST: ../auth/check-token
+  @Post('check-token')
+  async checkToken(@Body('token') token: string) {
+    const res = await this.authService.checkToken(token);
     return new CustomResponse(res);
   }
 }

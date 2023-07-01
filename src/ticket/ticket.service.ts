@@ -89,4 +89,42 @@ export class TicketService {
       throw new ForbiddenException(error);
     }
   }
+  //getMyTicket
+  async myTicket(userId: string) {
+    try {
+      const res = await this.prismaService.ticket.findMany({
+        where: {
+          authorId: userId,
+        },
+        include: {
+          trip: {
+            include: {
+              bus: {
+                include: {
+                  author: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                  type: true,
+                },
+              },
+              route: {
+                include: {
+                  locations: {
+                    include: {
+                      location: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      return res;
+    } catch (error) {
+      throw new ForbiddenException('Error');
+    }
+  }
 }
