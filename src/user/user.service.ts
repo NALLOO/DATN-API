@@ -1,4 +1,8 @@
 import { PrismaService } from '../prisma/prisma.service';
+<<<<<<< HEAD
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { UpdateUserDTO } from './dto';
+=======
 import {
   ForbiddenException,
   HttpException,
@@ -7,6 +11,7 @@ import {
 } from '@nestjs/common';
 import * as argon from 'argon2';
 import { CreateCoachDTO, UpdateUserDTO } from './dto';
+>>>>>>> master
 import { Role } from 'src/auth/enum/role.enum';
 
 @Injectable()
@@ -31,6 +36,19 @@ export class UserService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
+<<<<<<< HEAD
+
+  async getCoach(){
+    try {
+      const res = await this.prismaService.user.findMany({
+        where: {
+          role: Role.COACH
+        }
+      })
+      return res
+    } catch (error) {
+      throw new ForbiddenException(error)
+=======
   //get List coach
   async getCoach() {
     try {
@@ -116,6 +134,7 @@ export class UserService {
       return coach;
     } catch (error) {
       throw new ForbiddenException({ error });
+>>>>>>> master
     }
   }
 }
