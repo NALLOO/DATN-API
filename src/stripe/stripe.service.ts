@@ -81,8 +81,8 @@ export class StripeService {
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:8080/',
-      cancel_url: 'http://localhost:8080/login',
+      success_url: `${this.configService.get('FRONT_END')}`,
+      cancel_url: `${this.configService.get('FRONT_END')}`,
     });
 
     return session;

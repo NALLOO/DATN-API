@@ -57,9 +57,14 @@ export class TripService {
             },
           },
         },
-        orderBy: {
-          price: query.orderBy ? query.orderBy : 'asc',
-        },
+        orderBy: [
+          {
+            timeStart: 'desc',
+          },
+          {
+            price: query.orderBy ? query.orderBy : 'asc',
+          },
+        ],
       }),
     ]);
     return { total, data };
@@ -191,10 +196,14 @@ export class TripService {
               },
               startLocation: true,
             },
-            orderBy: {
-              status: 'asc',
-              code: 'asc',
-            },
+            orderBy: [
+              {
+                status: 'desc',
+              },
+              {
+                code: 'asc',
+              },
+            ],
           },
         },
       });
