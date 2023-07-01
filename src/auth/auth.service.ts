@@ -11,6 +11,7 @@ import { LoginDTO, RegisterDTO } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
+import { Role } from './enum/role.enum';
 
 @Injectable({})
 export class AuthService {
@@ -40,7 +41,15 @@ export class AuthService {
       };
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ForbiddenException('Email has been used');
+        throw new HttpException(
+          {
+            errors: {
+              email: 'Email đã được sử dụng',
+            },
+            message: 'Email đã được sử dụng',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
@@ -61,7 +70,7 @@ export class AuthService {
     if (!passwordMatched) {
       throw new ForbiddenException('Incorrect password!');
     }
-    
+
     delete user.password;
     const access_token = await this.convertToJwtString(user.id, user.email);
     return {
@@ -137,37 +146,56 @@ export class AuthService {
         },
       });
       if (!user)
-        throw new HttpException('Email not found', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          {
+            error: {
+              email: 'Email chưa được đăng ký!',
+            },
+          },
+          HttpStatus.NOT_FOUND,
+        );
       const token = await this.convertResetPasswordJwt(user.id, user.email);
       const link = `${this.configService.get(
-        'FRONT_END',
+        user.role === Role.USER ? 'FRONT_END' : 'FRONT_END_ADMIN',
       )}/reset-password/${token}`;
       this.mailService.sendMail(email, 'Thay đổi mật khẩu', 'resetPassword', {
         name: user.name,
         link,
       });
-      return
+      return;
     } catch (error) {
-      throw new ForbiddenException(error)
+      throw new ForbiddenException('error');
     }
   }
-  //
-  async resetPassword(password: string, token: string){
+  //reset password
+  async resetPassword(password: string, token: string) {
     try {
-      const decode = await this.jwtService.verifyAsync(token, {secret: this.configService.get('JWT_RESET_PASSWORD_SECRET')})
-      const hashedPassword = await argon.hash(password)
+      const decode = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get('JWT_RESET_PASSWORD_SECRET'),
+      });
+      const hashedPassword = await argon.hash(password);
       const user = await this.prismaService.user.update({
-        where:{
-          id: decode.sub
+        where: {
+          id: decode.sub,
         },
         data: {
-          password: hashedPassword
-        }
-      })
-      return user
+          password: hashedPassword,
+        },
+      });
+      return user;
     } catch (error) {
-      throw new HttpException('Token failed',HttpStatus.BAD_REQUEST)
+      throw new HttpException('Token failed', HttpStatus.BAD_REQUEST);
     }
-
+  }
+  // check-token
+  async checkToken(token: string) {
+    try {
+      const decode = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get('JWT_RESET_PASSWORD_SECRET'),
+      });
+      return;
+    } catch (error) {
+      throw new ForbiddenException('error');
+    }
   }
 }
