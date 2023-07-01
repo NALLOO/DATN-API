@@ -22,11 +22,12 @@ export class AuthService {
     private mailService: MailService,
   ) {}
   async register(registerDTO: RegisterDTO) {
-    const hashedPassword = await argon.hash(registerDTO.password);
     try {
+      const hashedPassword = await argon.hash(registerDTO.password);
       const user = await this.prismaService.user.create({
         data: {
           ...registerDTO,
+          role: Role.USER,
           password: hashedPassword,
         },
         select: {
@@ -61,14 +62,28 @@ export class AuthService {
       },
     });
     if (!user) {
-      throw new HttpException('Email not found!', 404);
+      throw new HttpException(
+        {
+          errors: {
+            email: 'Email chưa được đăng ký',
+          },
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
     const passwordMatched = await argon.verify(
       user.password,
       loginDTO.password,
     );
     if (!passwordMatched) {
-      throw new ForbiddenException('Incorrect password!');
+      throw new HttpException(
+        {
+          errors: {
+            password: 'Mật khẩu không chính xác',
+          },
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     delete user.password;
@@ -104,7 +119,11 @@ export class AuthService {
     );
     if (!passwordMatched)
       throw new HttpException(
-        'Invalid current password!',
+        {
+          errors: {
+            currentPassword: 'Mật khẩu không chính xác',
+          },
+        },
         HttpStatus.BAD_REQUEST,
       );
     const newHashedPassword = await argon.hash(changePassData.newPassword);
@@ -118,7 +137,7 @@ export class AuthService {
         },
       });
     } catch (error) {
-      throw new ForbiddenException(error);
+      throw new ForbiddenException({ error });
     }
   }
   //
@@ -164,10 +183,10 @@ export class AuthService {
       });
       return;
     } catch (error) {
-      throw new ForbiddenException('error');
+      throw new ForbiddenException({error});
     }
   }
-  //reset password
+  //
   async resetPassword(password: string, token: string) {
     try {
       const decode = await this.jwtService.verifyAsync(token, {

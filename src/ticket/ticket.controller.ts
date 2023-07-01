@@ -18,6 +18,7 @@ import RequestWithUser from 'src/auth/interface/request-with-user.interface';
 export class TicketController {
   constructor(private ticketService: TicketService) {}
   //update ticket
+  //PUT: ../ticket/:id
   @Put(':id')
   async update(
     @Param('id') ticketId: string,
@@ -32,6 +33,9 @@ export class TicketController {
     const res = await this.ticketService.myTicket(request.user.id);
     return new CustomResponse(res);
   }
+
+  //get ticket
+  //GET: ../ticket/:id
   @Get(':id')
   async detail(@Param('id') ticketId: string) {
     const res = await this.ticketService.detail(ticketId);

@@ -69,6 +69,65 @@ export class TripService {
     ]);
     return { total, data };
   }
+    //get list trip
+    async myTrip(userId: string, query: TripQueryDTO) {
+      const option = trimQuery({
+        startProvinceId: query.startProvinceId,
+        endProvinceId: query.endProvinceId,
+      });
+      const dateOption = query.date
+        ? {
+            gte: moment(query.date).toISOString(),
+            lte: moment(query.date).add(1, 'days').toISOString(),
+          }
+        : {};
+      const [total, data] = await this.prismaService.$transaction([
+        this.prismaService.trip.count({
+          where: {
+            route: option,
+            timeStart: dateOption,
+            bus: {
+              authorId: userId
+            }
+          },
+        }),
+        this.prismaService.trip.findMany({
+          skip: ((parseInt(query.page) - 1) | 0) * (parseInt(query.limit) | 10),
+          take: parseInt(query.limit) | 10,
+          where: {
+            route: option,
+            timeStart: dateOption,
+            bus: {
+              authorId: userId
+            }
+          },
+          include: {
+            bus: {
+              include: {
+                type: true,
+                author: true,
+              },
+            },
+            route: {
+              include: {
+                startProvince: true,
+                endProvince: true,
+                locations: {
+                  include: {
+                    location: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            timeStart: 'asc',
+          },
+        }),
+      ]);
+      return { total, data };
+    }
+  
   //create Trip
   async create(createTripDTO: CreateTripDTO) {
     try {

@@ -30,6 +30,7 @@ model BusType {
   name         String @unique()
   numberOfSeat Int
   listTicket   String
+  image        String 
   buses        Bus[]
 }
 
@@ -38,7 +39,7 @@ model Bus {
   author      User    @relation("authorBus", fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
   numberPlate String
-  type        BusType @relation(fields: [typeId], references: [id])
+  type        BusType @relation(fields: [typeId], references: [id], onDelete: Cascade)
   typeId      String
   trips       Trip[]
 }
@@ -112,6 +113,6 @@ model RouteMapLocation {
 model Order {
   id      String   @id @default(uuid())
   tickets Ticket[]
-  user    User?    @relation(fields: [userId], references: [id])
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  String?
 }

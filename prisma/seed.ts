@@ -1,18 +1,23 @@
 import { PrismaClient } from '@prisma/client';
-import { BusTypeData } from './BusType';
 import { ListProvince } from './Province';
 
 const prisma = new PrismaClient();
 async function main() {
   prisma.$transaction([
-    prisma.busType.deleteMany({}),
-    prisma.busType.createMany({
-      data: BusTypeData,
-    }),
     prisma.province.deleteMany({}),
     prisma.province.createMany({
       data: ListProvince,
     }),
+    prisma.user.deleteMany({}),
+    prisma.user.create({
+      data: {
+        name: 'ADMIN',
+        phone: '079914332',
+        email: 'nghiak57dl1@gmail.com',
+        password: '123456',
+        role: 1
+      }
+    })
   ]);
 }
 

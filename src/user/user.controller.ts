@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
-import { Request } from 'express';
 import CustomResponse from '../helper/response/response';
-import { UpdateUserDTO } from './dto';
+import { CreateCoachDTO, UpdateUserDTO } from './dto';
 import { UserService } from './user.service';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
 import { Role } from 'src/auth/enum/role.enum';
@@ -11,13 +22,13 @@ import { Role } from 'src/auth/enum/role.enum';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  //Get: .../user/me
   @UseGuards(JwtAuthGuard)
   @Get('me')
   me(@Req() request: RequestWithUser) {
     const indexOfS = Object.values(Role).indexOf(
       request.user.role as unknown as Role,
     );
-
     const key = Object.keys(Role)[indexOfS];
     const data = {
       ...request.user,
@@ -37,6 +48,8 @@ export class UserController {
     return new CustomResponse(data, true);
   }
 
+  //update profile
+  //PUT: ../user/update
   @UseGuards(JwtAuthGuard)
   @Put('update')
   async update(
@@ -45,5 +58,49 @@ export class UserController {
   ) {
     const res = await this.userService.update(request.user.id, userData);
     return new CustomResponse(res);
+  }
+  //Thêm nhà xe
+  //POST: ../user/create-coach
+  @UseGuards(JwtAuthGuard)
+  @Post('create-coach')
+  async createCoach(
+    @Req() request: RequestWithUser,
+    @Body() createCoachDTO: CreateCoachDTO,
+  ) {
+    if (request.user.role !== Role.ADMIN)
+      throw new HttpException(
+        'Bạn không có quyền',
+        HttpStatus.PRECONDITION_FAILED,
+      );
+    const res = await this.userService.createCoach(createCoachDTO);
+    return new CustomResponse(res);
+  }
+  // get list nhà xe
+  //GET: ../user/list-coach
+  @Get('list-coach')
+  async getCoach() {
+    const res = await this.userService.getCoach();
+    return new CustomResponse(res);
+  }
+  //detail coach
+  //GET: ../user/coach/:id
+  @UseGuards(JwtAuthGuard)
+  @Get('coach/:id')
+  async detailCoach(@Param('id') coachId: string) {
+    const res = await this.userService.detailCoach(coachId);
+    return res;
+  }
+  //delete coach
+  //DELETE: ../user/coach/:id
+  @UseGuards(JwtAuthGuard)
+  @Delete('coach/:id')
+  async deleteCoach(
+    @Param('id') coachId: string,
+    @Req() request: RequestWithUser,
+  ) {
+    if (request.user.role !== Role.ADMIN)
+      throw new HttpException('Bạn không có quyền', HttpStatus.PRECONDITION_FAILED);
+    const res = await this.userService.deleteCoach(coachId);
+    return res;
   }
 }
