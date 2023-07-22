@@ -55,13 +55,51 @@ export class AuthService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
-  async login(loginDTO: LoginDTO) {
+  async loginAdmin(loginDTO: LoginDTO) {
     const user = await this.prismaService.user.findFirst({
       where: {
         email: loginDTO.email,
       },
     });
-    if (!user) {
+    if (!user || user.role === Role.USER) {
+      throw new HttpException(
+        {
+          errors: {
+            email: 'Email chưa được đăng ký',
+          },
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const passwordMatched = await argon.verify(
+      user.password,
+      loginDTO.password,
+    );
+    if (!passwordMatched) {
+      throw new HttpException(
+        {
+          errors: {
+            password: 'Mật khẩu không chính xác',
+          },
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    delete user.password;
+    const access_token = await this.convertToJwtString(user.id, user.email);
+    return {
+      user,
+      access_token,
+    };
+  }
+  async loginUser(loginDTO: LoginDTO) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        email: loginDTO.email,
+      },
+    });
+    if (!user || user.role !== Role.USER) {
       throw new HttpException(
         {
           errors: {
@@ -158,21 +196,21 @@ export class AuthService {
   }
   //reset password
   async sendMailResetPassword(email: string) {
-    try {
-      const user = await this.prismaService.user.findUnique({
-        where: {
-          email,
-        },
-      });
-      if (!user)
-        throw new HttpException(
-          {
-            error: {
-              email: 'Email chưa được đăng ký!',
-            },
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!user)
+      throw new HttpException(
+        {
+          error: {
+            email: 'Email chưa được đăng ký!',
           },
-          HttpStatus.NOT_FOUND,
-        );
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    try {
       const token = await this.convertResetPasswordJwt(user.id, user.email);
       const link = `${this.configService.get(
         user.role === Role.USER ? 'FRONT_END' : 'FRONT_END_ADMIN',
@@ -183,7 +221,7 @@ export class AuthService {
       });
       return;
     } catch (error) {
-      throw new ForbiddenException({error});
+      throw new ForbiddenException({ error });
     }
   }
   //

@@ -15,11 +15,40 @@ export class BusService {
           take: 10,
         };
       const [total, result] = await this.prismaService.$transaction([
-        this.prismaService.bus.count({
+        this.prismaService.bus.count({}),
+        this.prismaService.bus.findMany({
           ...option,
+          include: {
+            author: true,
+            type: true,
+          },
+        }),
+      ]);
+      return { total, result };
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
+  }
+  //get mine
+  async getMine(coachId: string, query: any) {
+    try {
+      let option = {};
+      if (query.page)
+        option = {
+          skip: (parseInt(query.page) - 1) * 10,
+          take: 10,
+        };
+      const [total, result] = await this.prismaService.$transaction([
+        this.prismaService.bus.count({
+          where: {
+            authorId: coachId,
+          },
         }),
         this.prismaService.bus.findMany({
           ...option,
+          where: {
+            authorId: coachId,
+          },
           include: {
             author: true,
             type: true,

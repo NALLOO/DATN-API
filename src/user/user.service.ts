@@ -1,8 +1,5 @@
+import { MailService } from './../mail/mail.service';
 import { PrismaService } from '../prisma/prisma.service';
-<<<<<<< HEAD
-import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UpdateUserDTO } from './dto';
-=======
 import {
   ForbiddenException,
   HttpException,
@@ -11,12 +8,16 @@ import {
 } from '@nestjs/common';
 import * as argon from 'argon2';
 import { CreateCoachDTO, UpdateUserDTO } from './dto';
->>>>>>> master
 import { Role } from 'src/auth/enum/role.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private mailService: MailService,
+    private configService: ConfigService,
+  ) {}
   async update(userId: string, userData: UpdateUserDTO) {
     try {
       const user = await this.prismaService.user.update({
@@ -36,27 +37,30 @@ export class UserService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
-<<<<<<< HEAD
-
-  async getCoach(){
-    try {
-      const res = await this.prismaService.user.findMany({
-        where: {
-          role: Role.COACH
-        }
-      })
-      return res
-    } catch (error) {
-      throw new ForbiddenException(error)
-=======
   //get List coach
-  async getCoach() {
+  async getCoach(page?: number) {
+    let option = {};
+    if (page)
+      option = {
+        skip: (page - 1) * 10,
+        take: 10,
+      };
     try {
-      const res = await this.prismaService.user.findMany({
+      const total = await this.prismaService.user.count({
         where: {
           role: Role.COACH,
         },
-        include: {
+      });
+      const res = await this.prismaService.user.findMany({
+        ...option,
+        where: {
+          role: Role.COACH,
+        },
+        select: {
+          name: true,
+          phone: true,
+          email: true,
+          id: true,
           Bus: {
             include: {
               type: true,
@@ -64,6 +68,30 @@ export class UserService {
           },
         },
       });
+      return { result: res, total };
+    } catch (error) {
+      throw new ForbiddenException('error');
+    }
+  }
+  async allCoach() {
+    try {
+      const res = await this.prismaService.user.findMany({
+        where: {
+          role: Role.COACH,
+        },
+        select: {
+          name: true,
+          phone: true,
+          email: true,
+          id: true,
+          Bus: {
+            include: {
+              type: true,
+            },
+          },
+        },
+      });
+      return res;
     } catch (error) {
       throw new ForbiddenException('error');
     }
@@ -80,8 +108,29 @@ export class UserService {
           phone: true,
         },
       });
+      await this.mailService.sendMail(
+        createCoachDTO.email,
+        'Đăng ký nhà xe',
+        'createCoach',
+        {
+          name: createCoachDTO.name,
+          password: createCoachDTO.password,
+          link: this.configService.get('FRONT_END_ADMIN'),
+        },
+      );
       return res;
     } catch (error) {
+      if (error.code === 'P2002') {
+        throw new HttpException(
+          {
+            errors: {
+              email: 'Email đã được sử dụng',
+            },
+            message: 'Email đã được sử dụng',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       throw new HttpException({ error }, HttpStatus.BAD_REQUEST);
     }
   }
@@ -134,7 +183,6 @@ export class UserService {
       return coach;
     } catch (error) {
       throw new ForbiddenException({ error });
->>>>>>> master
     }
   }
 }

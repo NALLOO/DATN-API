@@ -13,4 +13,9 @@ export class UpdateBusTypeDTO {
   @IsOptional()
   @IsString()
   listTicket: string
+
+  @IsOptional()
+  @IsString()
+  image: string
+
 }

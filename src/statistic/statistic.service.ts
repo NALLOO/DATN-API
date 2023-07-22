@@ -31,14 +31,30 @@ export class StatisticService {
           ...option,
           where: {
             timeStart: {
-              gte: moment(query.from).toISOString(), 
+              gte: moment(query.from).toISOString(),
               lte: moment(query.to).toISOString(),
             },
             bus: {
               authorId: query.authorId,
             },
           },
-          include: { tickets: true },
+          include: {
+            tickets: {
+              where: {
+                NOT: [
+                  {
+                    authorId: null,
+                  },
+                ],
+              },
+            },
+            route: {
+              include: {
+                startProvince: true,
+                endProvince: true,
+              },
+            },
+          },
         }),
         this.prismaService.trip.findMany({
           where: {
@@ -70,9 +86,9 @@ export class StatisticService {
       listAll.forEach((trip) => {
         totalSale += trip.tickets.length * parseInt(trip.price);
       });
-      return {total, totalSale, result}
+      return { total, totalSale, result };
     } catch (error) {
-        throw new ForbiddenException(error)
+      throw new ForbiddenException(error);
     }
   }
 }

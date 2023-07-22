@@ -15,14 +15,23 @@ export class BusTypeService {
     private firebaseService: FirebaseService,
   ) {}
   //get all bus type
-  async getAll() {
-    const data = await this.prismaService.busType.findMany({});
-    return data.map((item) => {
-      return {
-        ...item,
-        listTicket: JSON.parse(item.listTicket),
+  async getAll(page?: number) {
+    let option = {};
+    if (page)
+      option = {
+        skip: (page - 1) * 10,
+        take: 10,
       };
+    const total = await this.prismaService.busType.count({});
+    const result = await this.prismaService.busType.findMany({
+      ...option,
     });
+    return { total, result };
+  }
+  //
+  async all() {
+    const result = await this.prismaService.busType.findMany({});
+    return result;
   }
   //create bus type
   async create(createBusTypeDTO: CreateBusTypeDTO, file: Express.Multer.File) {
@@ -44,6 +53,7 @@ export class BusTypeService {
             errors: {
               name: 'Tên đã được sử dụng',
             },
+            message: 'Tên đã được sử dụng',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -65,16 +75,11 @@ export class BusTypeService {
         where: {
           id: typeId,
         },
-        data: file
-          ? {
-              ...updateBusTypeDTO,
-              image: link,
-              numberOfSeat: parseInt(updateBusTypeDTO.numberOfSeat),
-            }
-          : {
-              ...updateBusTypeDTO,
-              numberOfSeat: parseInt(updateBusTypeDTO.numberOfSeat),
-            },
+        data: {
+          ...updateBusTypeDTO,
+          image: file ? link : updateBusTypeDTO.image,
+          numberOfSeat: parseInt(updateBusTypeDTO.numberOfSeat),
+        },
       });
       return res;
     } catch (error) {
@@ -94,15 +99,29 @@ export class BusTypeService {
   // delete bus type
   async delete(typeId: string) {
     try {
-      this.prismaService.busType.delete({
+      const res = await this.prismaService.busType.delete({
         where: {
           id: typeId,
         },
       });
+      return res;
     } catch (error) {
       throw new HttpException('error', HttpStatus.BAD_REQUEST, {
         cause: error,
       });
+    }
+  }
+  //detail
+  async detail(typeId: string) {
+    try {
+      const res = await this.prismaService.busType.findUnique({
+        where: {
+          id: typeId,
+        },
+      });
+      return res;
+    } catch (error) {
+      throw new ForbiddenException({ error });
     }
   }
 }

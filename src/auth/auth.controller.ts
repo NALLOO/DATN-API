@@ -22,9 +22,13 @@ export class AuthController {
     return this.authService.register(body);
   }
   //POST: .../auth/login
-  @Post('login') //login
-  login(@Body() body: LoginDTO) {
-    return this.authService.login(body);
+  @Post('user/login') //login
+  loginUser(@Body() body: LoginDTO) {
+    return this.authService.loginUser(body);
+  }
+  @Post('admin/login') //login
+  loginAdmin(@Body() body: LoginDTO) {
+    return this.authService.loginAdmin(body);
   }
   //POST: ../auth/change-password
   @UseGuards(JwtAuthGuard)

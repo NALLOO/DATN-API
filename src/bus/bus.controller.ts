@@ -45,23 +45,23 @@ export class BusController {
   @Get()
   async getAll(@Req() request: RequestWithUser, @Query() query: any) {
     const role = request.user.role;
-    if (role !== Role.ADMIN)
+    if (role === Role.USER)
       throw new HttpException(
         "You don't have permission",
         HttpStatus.PRECONDITION_FAILED,
       );
 
-    const res = await this.busService.getAll(query);
+    const res =
+      role === Role.ADMIN
+        ? await this.busService.getAll(query)
+        : await this.busService.getMine(request.user.id, query);
     return new CustomResponse(res);
   }
   //
   // delete bus
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(
-    @Req() request: RequestWithUser,
-    @Param('id') busId: string,
-  ) {
+  async delete(@Req() request: RequestWithUser, @Param('id') busId: string) {
     const role = request.user.role;
     if (role !== Role.ADMIN)
       throw new HttpException(
@@ -72,6 +72,7 @@ export class BusController {
     const res = await this.busService.delete(busId);
     return new CustomResponse(res);
   }
+
   @Get('detail/:id')
   async detail(@Param('id') busId: string) {
     const res = await this.busService.detail(busId);

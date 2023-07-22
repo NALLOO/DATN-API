@@ -6,8 +6,10 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -48,19 +50,8 @@ export class UserController {
     return new CustomResponse(data, true);
   }
 
-<<<<<<< HEAD
-  @Get('coach')
-  async getCoach(
-  ) {
-    const res = await this.userService.getCoach()
-
-    return new CustomResponse(res)
-  }
-
-=======
   //update profile
   //PUT: ../user/update
->>>>>>> master
   @UseGuards(JwtAuthGuard)
   @Put('update')
   async update(
@@ -89,8 +80,13 @@ export class UserController {
   // get list nhà xe
   //GET: ../user/list-coach
   @Get('list-coach')
-  async getCoach() {
-    const res = await this.userService.getCoach();
+  async getCoach(@Query('page', ParseIntPipe) page?: number) {
+    const res = await this.userService.getCoach(page);
+    return new CustomResponse(res);
+  }
+  @Get('all-coach')
+  async allCoach() {
+    const res = await this.userService.allCoach();
     return new CustomResponse(res);
   }
   //detail coach
@@ -99,7 +95,7 @@ export class UserController {
   @Get('coach/:id')
   async detailCoach(@Param('id') coachId: string) {
     const res = await this.userService.detailCoach(coachId);
-    return res;
+    return new CustomResponse(res);
   }
   //delete coach
   //DELETE: ../user/coach/:id
@@ -110,7 +106,10 @@ export class UserController {
     @Req() request: RequestWithUser,
   ) {
     if (request.user.role !== Role.ADMIN)
-      throw new HttpException('Bạn không có quyền', HttpStatus.PRECONDITION_FAILED);
+      throw new HttpException(
+        'Bạn không có quyền',
+        HttpStatus.PRECONDITION_FAILED,
+      );
     const res = await this.userService.deleteCoach(coachId);
     return res;
   }
